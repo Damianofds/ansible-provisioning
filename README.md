@@ -4,7 +4,8 @@ An ansible custom role to install PostGIS + a playbook which uses [this](https:/
 ## Usage
 
 * Install python and other related stuff, ansible 1.9.4, vagrant and vbox (see below for the istructions and required sw version)
-* clone this repo 
+* clone this repo
+* install the roles for java and tomcat ``sudo ansible-galaxy install -r requirements.yml``
 * run ``vagrant up`` on the root folder of the repo
 or
 * add your ip list in the ``hosts`` file and run ``sudo ansible-playbook -vvvv -i hosts playbook.yml -u vagrant -k`` (no -k option if you use a SSH key)
@@ -56,7 +57,11 @@ Ubuntu precise repo has a too old version of vagrant, let's install it using the
 #tmp/$ vagrant --version
 Vagrant 1.7.4
 ```
-Virtual should be already installed on ubuntu 12 desktop, if not
+Virtual should be already installed on ubuntu 12 desktop but it's a 4.1.x version..
+let's install oracle vbox version 5.x, first of all purge all the existing vbox packages
 ```
-#tmp/$ sudo apt-get install virtualbox-qt
+#tmp/$ sudo apt-get purge virtualbox-qt
 ```
+then follow the instructions for Debian/Ubuntu on the [official vbox website](https://www.virtualbox.org/wiki/Linux_Downloads)
+
+Ah and the default box loaded with vagrant is a 64 bit OS so if you get some generic errors from the vagrant provider be sure to have VT-x extensions enabled on your control machine!
