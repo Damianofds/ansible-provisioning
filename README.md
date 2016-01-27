@@ -2,8 +2,9 @@
 An ansible custom role to install PostGIS + a playbook which uses [this](https://github.com/silpion/ansible-tomcat) and [this](https://github.com/silpion/ansible-java) awesome  roles to install tomcat and java.
 
 ## Usage
+To run ansible a linux machine is needed... this istruction are tested on a Ubuntu desktop 12.04.5 64bit control machine.
 
-* Install python and other related stuff, ansible 1.9.4, vagrant and vbox (see below for the istructions and required sw version)
+* On the control machine Install **python and its other related stuff**, **ansible 1.9.4**, **vagrant and vbox** (see below for the istructions and required sw version) and don't forget to install also **cUrl**
 * clone this repo
 * install the roles for java and tomcat ``sudo ansible-galaxy install -r requirements.yml``
 * run ``vagrant up`` on the root folder of the repo
