@@ -1,5 +1,5 @@
 # ansible-provisioning
-An ansible custom role to install PostGIS + a playbook which uses (this)[https://github.com/silpion/ansible-tomcat] and (this)[https://github.com/silpion/ansible-java] awesome  roles to install tomcat and java.
+An ansible custom role to install PostGIS + a playbook which uses [this](https://github.com/silpion/ansible-tomcat) and [this](https://github.com/silpion/ansible-java) awesome  roles to install tomcat and java.
 
 ## Usage
 
