@@ -1,0 +1,8 @@
+- name: silpion.util
+  src: groover.util
+
+- name: silpion.java
+  src: https://github.com/silpion/ansible-java
+
+- name: silpion.tomcat
+  src: https://github.com/silpion/ansible-tomcat

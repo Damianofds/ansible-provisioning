@@ -1,0 +1,30 @@
+---
+- hosts: all
+  vars:
+    java_oracle_distribution: jdk
+    java_oracle_version: 7u80
+    tomcat_version: 7.0.52
+    util_init_system: upstart
+    tomcat_instances:
+      - name: geoserver
+        service_name: geoserver
+        service_file: geoserver.conf
+        path: /srv/geoserver
+        user: tomcat
+        port_ajp: 18009
+        port_connector: 18080
+        port_redirect: 18443
+        port_shutdown: 18005
+      - name: ingestion
+        service_name: ingestion
+        service_file: ingestion.conf
+        path: /srv/geobatch
+        user: tomcat
+        port_ajp: 28009
+        port_connector: 28080
+        port_redirect: 28443
+        port_shutdown: 28005
+  roles:
+    - { role: silpion.java }
+    - { role: silpion.tomcat }
+    - { role: fds.gis }

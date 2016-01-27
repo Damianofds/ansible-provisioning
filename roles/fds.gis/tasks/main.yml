@@ -1,0 +1,70 @@
+---
+
+#STEP1 - add all the needed apt repos and install PostGIS
+
+- name: Add Ubuntu gis Repository
+  sudo: yes
+  apt_repository: repo='ppa:ubuntugis/ppa' state=present
+  register: repo1added
+
+- name: Add GEOS3 gis Repository
+  sudo: yes
+  apt_repository: repo='ppa:sharpie/for-science' state=present
+  when: repo1added|success
+  register: repo2added
+
+- name: Add postgis Repository
+  sudo: yes
+  apt_repository: repo='ppa:sharpie/postgis-stable' state=present
+  when: repo2added|success
+  register: allreposadded
+
+- name: Install required PostGIS packages (and btw also vim and curl)
+  action: apt pkg={{ item }} state=installed update_cache=true
+  sudo: yes
+  with_items:
+    - python-psycopg2
+    - postgresql-9.1-postgis2
+    - vim
+    - curl
+  when: allreposadded|success
+  register: postgisinstalled
+
+
+#STEP2 - configure a spatial database for geoserver
+
+- name: create db geoserver
+  postgresql_db: name=geoserver state=present
+  become: yes
+  become_method: sudo
+  become_user: postgres
+  when: postgisinstalled|success
+  register: dbcreated
+
+- name: create user geoserver
+  postgresql_user: db=geoserver name=geoserver password=geoserver role_attr_flags=NOSUPERUSER state=present
+  become: yes
+  become_method: sudo
+  become_user: postgres
+  when: dbcreated|success
+  register: usercreated
+
+- name: enable spatial extensions
+  postgresql_ext: name=postgis db=geoserver
+  become: yes
+  become_method: sudo
+  become_user: postgres
+  when: usercreated|success
+  register: dbconfigured
+
+- name: psql check schema geoserver
+  command: psql -t -d geoserver -c "SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = 'geoserver');"
+  register: check_schema
+  changed_when: "'f' in '{{ check_schema.stdout }}'"
+  sudo: yes
+  sudo_user: postgres
+
+- name: create schema
+  command: sudo -u postgres psql -d geoserver -c "CREATE SCHEMA geoserver AUTHORIZATION geoserver"
+  when: check_schema.changed
+
