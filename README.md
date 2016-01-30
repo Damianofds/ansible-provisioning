@@ -1,28 +1,44 @@
 # ansible-provisioning
 Install PostGIS, java and 2 tomcat instances on a vagrant VM or on your own production VM
 
-This repo contanis an ansible role to install PostGIS on ubuntu 12.04
+This repo contanis an ansible role to install PostGIS on ubuntu 12.04.
+
 The playbook in ``playbook.yml`` use that role to install postgis and [this](https://github.com/silpion/ansible-tomcat) and [this](https://github.com/silpion/ansible-java) awesome roles to install java and 2 tomcat instances.
 
 ## Usage
-To run ansible a linux machine is needed... this instructions are tested on a Ubuntu desktop 12.04.5 64bit control machine.
 
-On the control machine Install this 3 things:
-* **python and its other related stuff**, 
-* **ansible 1.9.4**, 
-* **vagrant and vbox**
-
-see the 3 sections below for the istructions and required packages version... ah! and don't forget to install also **cUrl**.
+See below to **Setting up the control machine**.
 
 after you setup your control machine:
+
 * clone this repo (the repo root dir is indicated with **#~/repo-root$**)
 * install the roles for java and tomcat running ``#~/repo-root$ sudo ansible-galaxy install -r requirements.yml``
+
 then you have two options:
+
 * run ``#~/repo-root$ vagrant up`` on the root folder of the repo
-or
+
+**or**
+
 * add your ip list in the ``hosts`` file and run ``#~/repo-root$ sudo ansible-playbook -vvvv -i hosts playbook.yml -u vagrant -k`` (no -k option if you use a SSH key) to deploy your own production virtual machines.
 
-## Install python stuff
+## Setting up the control machine
+
+Assuming that you are going to setup an ubuntu 12.04.5 machine from a fresh installation you need to install 3 main things:
+* **python and its other related stuff**
+* **ansible 1.9.4**
+* **vagrant and vbox** only if you wanna use vagrant pf course
+
+but before ensure to have apt.cache updated and some basics tools installed:
+
+```
+#~/$ sudo apt-get update
+#~/$ sudo apt-get install git vim curl
+#There's some shit in the repo useful to setup the control machine, so let's clone it now
+#~/$ git clone https://github.com/Damianofds/ansible-provisioning.git
+```
+
+### Install python stuff
 In order to run ansible we need for python 2.7 which comes out of the box in ubuntu 2.7.
 Anyways we have to install a couple of other python related packages
 
@@ -40,7 +56,7 @@ Jinja2==2.8
 
 ```
 
-## Install ansible 1.9.4 on Ubuntu 12.04 LTS
+### Install ansible 1.9.4 on Ubuntu 12.04 LTS
 
 First, install ansible as suggested onthe official website:
 ```
@@ -62,12 +78,12 @@ now we have the ansible dependencies installed, let's go to install ansible 1.9.
 ansible 1.9.4
 ```
 
-## Install vagrant and vbox
+### Install vagrant and vbox
 Ubuntu precise repo has a too old version of vagrant, let's install it using the deb pkg on the vagrant website
 ```
 #/$ cd /tmp
 #tmp/$ wget https://releases.hashicorp.com/vagrant/1.7.4/vagrant_1.7.4_x86_64.deb
-#tmp/$ dpkg -i vagrant_1.7.4_x86_64.deb
+#tmp/$ sudo dpkg -i vagrant_1.7.4_x86_64.deb
 #tmp/$ vagrant --version
 Vagrant 1.7.4
 ```
