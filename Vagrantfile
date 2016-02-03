@@ -6,7 +6,7 @@ Vagrant.configure(2) do |config|
   config.ssh.password = "vagrant"
   config.ssh.insert_key = true
   config.vm.network "private_network", ip: "192.168.66.6"
-  
+
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "playbook.yml"
   end
