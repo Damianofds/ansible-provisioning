@@ -1,0 +1,8 @@
+---
+geoserver_name: geoserver
+geoserver_catalina_base: /srv/geoserver
+geoserver_webapp: /srv/geoserver/catalina/geoserver/webapps
+geoserver_bin: /srv/geoserver/catalina/geoserver/bin
+war1_url: http://ares.boundlessgeo.com/geoserver/2.8.x/geoserver-2.8.x-latest-war.zip 
+tomcat_user: tomcat
+tomcat_group: tomcat

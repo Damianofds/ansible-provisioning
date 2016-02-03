@@ -1,0 +1,85 @@
+---
+# *** Stop geoserver, it's preferred to use a task here instead an handler
+- name: stop geoserver
+  service: name={{ geoserver_name }} state=stopped
+  become: yes
+  become_method: sudo
+  become_user: root
+
+# *** Copy the setenv.sh file
+- copy: src=setenv.sh dest={{ geoserver_bin }} owner={{ tomcat_user }} group={{ tomcat_group }} mode=0644
+  become: yes
+  become_method: sudo
+  become_user: tomcat
+
+# *** Download the geoserver zip release
+- name: download geoserver
+  get_url: url={{ war1_url }} dest=/tmp/download.zip mode=0440
+  when: (war1_url is defined) and (geoserver_webapp is defined)
+  register: geoserverDwFinished
+  become: yes
+  become_method: sudo
+  become_user: root
+
+# *** Extract the downloaded archive
+- name: extract geoserver
+  unarchive: src=/tmp/download.zip dest=/tmp copy=no
+  when: geoserverDwFinished|success
+  register: geoserverExFinished
+  become: yes
+  become_method: sudo
+  become_user: root
+
+# *** Deploy the war packg
+- name: deploy geoserver
+  command: mv /tmp/geoserver.war {{ geoserver_webapp }} 
+  when: (geoserver_webapp is defined) and (geoserverExFinished|success)
+  register: geoserverDpFinished
+  become: yes
+  become_method: sudo
+  become_user: root
+
+# *** set the permission on the war file
+- name: set permissions geoserver
+  file: dest={{ geoserver_webapp }}/geoserver.war mode=775 owner={{ tomcat_user }} group={{ tomcat_group }}
+  when: geoserverExFinished|success
+  become: yes
+  become_method: sudo
+  become_user: root
+
+# *** Start geoserver
+- name: start geoserver
+  service: name={{ geoserver_name }} state=started
+  become: yes
+  become_method: sudo
+  become_user: root
+
+- wait_for: host=0.0.0.0 port=8000 delay=10 state=drained
+  register: geoserver_started
+
+# *** Externalize the geoserver datadir
+- name: externalizing datadir
+  command: cp -r {{ geoserver_webapp }}/geoserver/data {{ geoserver_catalina_base }}
+  when: geoserver_started|success
+  become: yes
+  become_method: sudo
+  become_user: tomcat
+
+# *** Copy the PostGIS datastore configuration file
+- name: copy PostGIS datastore
+  copy: src=PostGIS dest={{ geoserver_catalina_base }}/data/workspaces/it.geosolutions owner={{ tomcat_user }} group={{ tomcat_group }} mode=0644
+  become: yes
+  become_method: sudo
+  become_user: root
+
+# *** Restart geoserver
+- name: start geoserver
+  service: name={{ geoserver_name }} state=restarted
+  become: yes
+  become_method: sudo
+  become_user: root
+
+
+
+
+
