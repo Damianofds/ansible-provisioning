@@ -1,8 +1,10 @@
 ---
 - hosts: all
   vars:
+    # JAVA ROLE
     java_oracle_distribution: jdk
     java_oracle_version: 7u80
+    # TOMCAT ROLE
     tomcat_version: 7.0.52
     util_init_system: upstart
     tomcat_instances:
@@ -24,7 +26,18 @@
         port_connector: 28080
         port_redirect: 28443
         port_shutdown: 28005
+    #GEOSERVER ROLE
+    #must be equal to the path in the tomcat_instances
+    geoserver_catalina_base: /srv/geoserver
+    #location of the geoserver zip distribution
+    war1_url: http://ares.boundlessgeo.com/geoserver/2.8.x/geoserver-2.8.x-latest-war.zip
+    #APACHE ROLE
+    appname: geoserver
+    #the tomcat0s AJP port for proxy AJP configuration
+    port: 18009
   roles:
     - { role: silpion.java }
     - { role: silpion.tomcat }
-    - { role: fds.gis }
+    - { role: fds.postgis }
+    - { role: fds.geoserver }
+    - { role: fds.apache }
