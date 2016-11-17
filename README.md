@@ -1,9 +1,7 @@
 # ansible-provisioning
-Install PostGIS, java and 2 tomcat instances on a vagrant VM or on your own production VM
+Install java and tomcat and Geoserver on a redhat target machine
 
-This repo contanis an ansible role to install PostGIS on ubuntu 12.04.
-
-The playbook in ``playbook.yml`` use that role to install postgis and [this](https://github.com/silpion/ansible-tomcat) and [this](https://github.com/silpion/ansible-java) awesome roles to install java and 2 tomcat instances.
+It uses [this](https://github.com/silpion/ansible-tomcat) and [this](https://github.com/silpion/ansible-java) 3rd party roles to install java and tomcat.
 
 ## Usage
 
@@ -69,42 +67,12 @@ Jinja2==2.8
 
 ```
 
-### Install ansible 1.9.4 on Ubuntu 12.04 LTS
+### Install ansible > 2 on Ubuntu 12.04 LTS
 
-First, install ansible as suggested onthe official website:
+As suggested on the official website:
 ```
 #~/$ sudo apt-get install software-properties-common
 #~/$ sudo apt-add-repository ppa:ansible/ansible
 #~/$ sudo apt-get update
 #~/$ sudo apt-get install ansible
 ```
-But wait, we have installed ansible >= 2.0 we want 1.9.4! so let's remove it
-```
-#~/$ sudo apt-get remove ansible
-```
-
-now we have the ansible dependencies installed, let's go to install ansible 1.9.4 using the .deb in this repo
-```
-#~/repo-root$ cd ansible-binaries
-#~/repo-root/ansible-binaries/$ sudo dpkg -i ansible_1.9.4-1ppa~precise_all.deb
-#~/repo-root/ansible-binaries/$ ansible --version
-ansible 1.9.4
-```
-
-### Install vagrant and vbox
-Ubuntu precise repo has a too old version of vagrant, let's install it using the deb pkg on the vagrant website
-```
-#/$ cd /tmp
-#tmp/$ wget https://releases.hashicorp.com/vagrant/1.7.4/vagrant_1.7.4_x86_64.deb
-#tmp/$ sudo dpkg -i vagrant_1.7.4_x86_64.deb
-#tmp/$ vagrant --version
-Vagrant 1.7.4
-```
-Virtual should be already installed on ubuntu 12 desktop but it's a 4.1.x version..
-let's install oracle vbox version 5.x, first of all purge all the existing vbox packages
-```
-#tmp/$ sudo apt-get purge virtualbox-qt
-```
-then follow the instructions for Debian/Ubuntu on the [official vbox website](https://www.virtualbox.org/wiki/Linux_Downloads)
-
-Ah and the default box loaded with vagrant is a 64 bit OS so if you get some generic errors from the vagrant provider be sure to have VT-x extensions enabled on your control machine!
