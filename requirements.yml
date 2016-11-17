@@ -1,5 +1,5 @@
 - name: silpion.util
-  src: groover.util
+  src: https://github.com/silpion/ansible-util
 
 - name: silpion.java
   src: https://github.com/silpion/ansible-java

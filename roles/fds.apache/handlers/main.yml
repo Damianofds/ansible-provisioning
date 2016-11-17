@@ -1,5 +1,0 @@
-- name: apache_reload
-  service: name=apache2 state=reloaded
-  become: yes
-  become_method: sudo
-  become_user: root
