@@ -1,16 +1,16 @@
 ---
-# *** Stop geoserver, it's preferred to use a task here instead an handler
+# *** Stop geoserver, it's preferred to use a task here instead a handler
 - name: stop geoserver
   service: name={{ geoserver_name }} state=stopped
   become: yes
   become_method: sudo
   become_user: root
 
-# *** Copy the setenv.sh file
-- copy: src=setenv.sh dest={{ geoserver_bin }} owner={{ tomcat_user }} group={{ tomcat_group }} mode=0644
-  become: yes
-  become_method: sudo
-  become_user: tomcat
+# *** Copy the setenv.sh file *** ONLY REDHAT/CENTOS !!!
+#- copy: src=setenv.sh dest={{ geoserver_bin }} owner={{ tomcat_user }} group={{ tomcat_group }} mode=0644
+#  become: yes
+#  become_method: sudo
+#  become_user: tomcat
 
 # *** Download the geoserver zip release
 - name: download geoserver
@@ -30,10 +30,59 @@
   become_method: sudo
   become_user: root
 
+#------------------------------ EXTENSIONS ------------------------------------------------------
+#------------------------------------------------------------------------------------------------
+- file: path={{ geoserver_extracted_dir }} state=directory
+- file: path={{ geoserver_ext_dwndir }} state=directory
+
+# *** Extract the geoserver war
+- name: extract geoserver.war
+  unarchive: src=/tmp/geoserver.war dest={{ geoserver_extracted_dir }} copy=no
+  when: geoserverDwFinished|success
+  register: geoserverExWarFinished
+  become: yes
+  become_method: sudo
+  become_user: root
+
+# *** Download extensions
+- name: download extensions
+  get_url: url={{ item }} dest={{ geoserver_ext_dwndir }} mode=777
+  with_items: "{{ extensions_urls }}"
+  register: geoserverDwExtFinished
+
+# *** extract extensions
+- name: extract extensions
+  unarchive: src={{ item }} dest={{ geoserver_ext_dwndir }} remote_src=yes
+  with_items: "{{ extensions_archives }}"
+  when: geoserverDwExtFinished|success
+  register: geoserverExtExtracted
+  become: yes
+  become_method: sudo
+  become_user: root
+
+# *** move jar extensions in geoserver extracted dir folder
+- name: move extensions into geoserver
+  shell: mv {{ geoserver_ext_dwndir }}*.jar {{ geoserver_extracted_dir }}WEB-INF/lib/
+  when: geoserverExtExtracted|success
+  become: yes
+  become_method: sudo
+  become_user: root
+
+# *** Create geoserver war with extensions jars
+- name: archive geoserver with extensions
+  archive: path={{ geoserver_extracted_dir }} dest=/tmp/geoserver_ext.war format=zip owner={{ tomcat_user }} group={{ tomcat_group }}
+  when: geoserverExWarFinished|success
+  register: geoserverArchiveReady
+  become: yes
+  become_method: sudo
+  become_user: root
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+
 # *** Deploy the war packg
 - name: deploy geoserver
-  command: mv /tmp/geoserver.war {{ geoserver_webapp }} 
-  when: (geoserver_webapp is defined) and (geoserverExFinished|success)
+  command: mv /tmp/geoserver_ext.war {{ geoserver_webapp }}/geoserver.war 
+  when: (geoserver_webapp is defined) and (geoserverExWarFinished|success)
   register: geoserverDpFinished
   become: yes
   become_method: sudo
@@ -47,16 +96,6 @@
   become_method: sudo
   become_user: root
 
-# *** Start geoserver
-- name: start geoserver
-  service: name={{ geoserver_name }} state=started
-  become: yes
-  become_method: sudo
-  become_user: root
-
-- wait_for: host=0.0.0.0 port=8000 delay=10 state=drained
-  register: geoserver_started
-
 # *** Externalize the geoserver datadir
 - name: externalizing datadir
   command: cp -r {{ geoserver_webapp }}/geoserver/data {{ geoserver_catalina_base }}
@@ -65,21 +104,9 @@
   become_method: sudo
   become_user: tomcat
 
-# *** Copy the PostGIS datastore configuration file
-- name: copy PostGIS datastore
-  copy: src=PostGIS dest={{ geoserver_catalina_base }}/data/workspaces/it.geosolutions owner={{ tomcat_user }} group={{ tomcat_group }} mode=0644
-  become: yes
-  become_method: sudo
-  become_user: root
-
 # *** Restart geoserver
 - name: start geoserver
   service: name={{ geoserver_name }} state=restarted
   become: yes
   become_method: sudo
   become_user: root
-
-
-
-
-
