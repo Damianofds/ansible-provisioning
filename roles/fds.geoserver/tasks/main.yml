@@ -6,7 +6,7 @@
   become_method: sudo
   become_user: root
 
-# *** Copy the setenv.sh file *** ONLY REDHAT/CENTOS !!!
+# *** Copy the setenv.sh file *** NOT for REDHAT/CENTOS !!!
 #- copy: src=setenv.sh dest={{ geoserver_bin }} owner={{ tomcat_user }} group={{ tomcat_group }} mode=0644
 #  become: yes
 #  become_method: sudo
@@ -96,6 +96,13 @@
   become: yes
   become_method: sudo
   become_user: tomcat
+
+# *** Setting log directories
+- name: Set GeoServer logs dir
+  file: path={{ geoserver_logs_dir }} state=directory owner={{ tomcat_user }} group={{ tomcat_group }}
+
+- name: Set GeoServer auditing dir
+  file: path={{ geoserver_audit_dir }} state=directory owner={{ tomcat_user }} group={{ tomcat_group }}
 
 # *** set the permission on the war file
 - name: set permissions geoserver

@@ -1,0 +1,2 @@
+geoserver_logs_dir: "/srv/geoserver/logs/"
+geoserver_audit_dir: "{{ geoserver_logs_dir }}audit"
