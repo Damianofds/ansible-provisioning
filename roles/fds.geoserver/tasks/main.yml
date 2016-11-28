@@ -88,21 +88,22 @@
   become_method: sudo
   become_user: root
 
-# *** set the permission on the war file
-- name: set permissions geoserver
-  file: dest={{ geoserver_webapp }}/geoserver.war mode=775 owner={{ tomcat_user }} group={{ tomcat_group }}
-  when: geoserverExFinished|success
-  become: yes
-  become_method: sudo
-  become_user: root
-
 # *** Externalize the geoserver datadir
 - name: externalizing datadir
-  command: cp -r {{ geoserver_webapp }}/geoserver/data {{ geoserver_catalina_base }}
-  when: geoserver_started|success
+  command: cp -r {{ geoserver_extracted_dir }}data {{ geoserver_catalina_base }}
+  when: geoserverExWarFinished|success
+  register: geoserverDataDirExternalized
   become: yes
   become_method: sudo
   become_user: tomcat
+
+# *** set the permission on the war file
+- name: set permissions geoserver
+  file: dest={{ geoserver_webapp }}/geoserver.war mode=775 owner={{ tomcat_user }} group={{ tomcat_group }}
+  when: (geoserverDpFinished|success) and (geoserverDataDirExternalized|success)
+  become: yes
+  become_method: sudo
+  become_user: root
 
 # *** Restart geoserver
 - name: start geoserver

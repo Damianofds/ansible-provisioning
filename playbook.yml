@@ -10,6 +10,7 @@
     tomcat_instances:
       - name: geoserver
         service_name: geoserver
+        service_file: geoserver.service
         path: /srv/geoserver
         user: tomcat
         port_ajp: 8009
