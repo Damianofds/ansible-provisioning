@@ -91,7 +91,7 @@
 
 # *** Externalize the geoserver datadir
 - name: externalizing datadir
-  shell: cp -rf {{ geoserver_extracted_dir }}data/* {{ geoserver_external_datadir }}
+  shell: mkdir -p {{ geoserver_external_datadir }} && cp -rf {{ geoserver_extracted_dir }}data/* {{ geoserver_external_datadir }}
   when: (geoserverExWarFinished|success) and (geoserver_external_datadir is defined)
   register: geoserverDataDirExternalized
   become: yes
