@@ -19,7 +19,7 @@ extensions_urls:
     - "{{ extensions_baseurl }}geoserver-2.10.0-importer-plugin.zip"
     - "{{ extensions_baseurl }}geoserver-2.10.0-pyramid-plugin.zip"
     - "{{ community_modules_baseurl }}geoserver-2.10-SNAPSHOT-mbtiles-plugin.zip"
-    - "{{ community_modules_baseurl }}geoserver-2.10-SNAPSHOT-jms-cluster-plugin.zip"
+#    - "{{ community_modules_baseurl }}geoserver-2.10-SNAPSHOT-jms-cluster-plugin.zip"
     - "{{ community_modules_baseurl }}geoserver-2.10-SNAPSHOT-backup-restore-plugin.zip"
 extensions_archives:
     - "{{ geoserver_ext_dwndir }}geoserver-2.10.0-wps-plugin.zip"
@@ -30,5 +30,5 @@ extensions_archives:
     - "{{ geoserver_ext_dwndir }}geoserver-2.10.0-importer-plugin.zip"
     - "{{ geoserver_ext_dwndir }}geoserver-2.10.0-pyramid-plugin.zip"
     - "{{ geoserver_ext_dwndir }}geoserver-2.10-SNAPSHOT-mbtiles-plugin.zip"
-    - "{{ geoserver_ext_dwndir }}geoserver-2.10-SNAPSHOT-jms-cluster-plugin.zip"
+#    - "{{ geoserver_ext_dwndir }}geoserver-2.10-SNAPSHOT-jms-cluster-plugin.zip"
     - "{{ geoserver_ext_dwndir }}geoserver-2.10-SNAPSHOT-backup-restore-plugin.zip"

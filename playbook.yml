@@ -16,10 +16,12 @@
         port_ajp: 8009
         port_connector: 8080
         port_redirect: 8443
-        catalina_opts: "-DGEOSERVER_DATA_DIR=/srv/geoserver/data/ -Xmx2048m -Xms2048m -XX:MetaspaceSize=512m -DGEOSERVER_NODE_OPTS=id:$host_ip -DGEOSERVER_AUDIT_PATH={{ geoserver_audit_dir }} -DGEOSERVER_LOG_LOCATION={{ geoserver_logs_dir }}geoserver.log"
+        service_template: "/home/fds/work/code/ansible-provisioning/roles/templates-ovr/service_systemd.j2"
     #GEOSERVER ROLE
     #must be equal to the path in the tomcat_instances
+    geoserver_logs_dir: /var/geoserverlogs/
     geoserver_catalina_base: /srv/geoserver
+    geoserver_external_datadir: /var/geoserverdata
     #location of the geoserver zip distribution
     war1_url: http://ares.boundlessgeo.com/geoserver/2.10.x/geoserver-2.10.x-latest-war.zip
   roles:

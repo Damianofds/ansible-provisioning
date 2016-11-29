@@ -38,7 +38,7 @@
 # *** Extract the geoserver war
 - name: extract geoserver.war
   unarchive: src=/tmp/geoserver.war dest={{ geoserver_extracted_dir }} copy=no
-  when: geoserverDwFinished|success
+  when: geoserverExFinished|success
   register: geoserverExWarFinished
   become: yes
   become_method: sudo
@@ -63,7 +63,8 @@
 # *** move jar extensions in geoserver extracted dir folder
 - name: move extensions into geoserver
   shell: mv {{ geoserver_ext_dwndir }}*.jar {{ geoserver_extracted_dir }}WEB-INF/lib/
-  when: geoserverExtExtracted|success
+  when: (geoserverExtExtracted|success) and (geoserverExWarFinished|success)
+  register: geoserverStructureReady
   become: yes
   become_method: sudo
   become_user: root
@@ -71,7 +72,7 @@
 # *** Create geoserver war with extensions jars
 - name: archive geoserver with extensions
   archive: path={{ geoserver_extracted_dir }} dest=/tmp/geoserver_ext.war format=zip owner={{ tomcat_user }} group={{ tomcat_group }}
-  when: geoserverExWarFinished|success
+  when: geoserverStructureReady|success
   register: geoserverArchiveReady
   become: yes
   become_method: sudo
@@ -82,7 +83,7 @@
 # *** Deploy the war packg
 - name: deploy geoserver
   command: mv /tmp/geoserver_ext.war {{ geoserver_webapp }}/geoserver.war 
-  when: (geoserver_webapp is defined) and (geoserverExWarFinished|success)
+  when: (geoserver_webapp is defined) and (geoserverArchiveReady|success)
   register: geoserverDpFinished
   become: yes
   become_method: sudo
@@ -90,12 +91,20 @@
 
 # *** Externalize the geoserver datadir
 - name: externalizing datadir
-  command: cp -r {{ geoserver_extracted_dir }}data {{ geoserver_catalina_base }}
-  when: geoserverExWarFinished|success
+  shell: cp -rf {{ geoserver_extracted_dir }}data/* {{ geoserver_external_datadir }}
+  when: (geoserverExWarFinished|success) and (geoserver_external_datadir is defined)
   register: geoserverDataDirExternalized
   become: yes
   become_method: sudo
-  become_user: tomcat
+  become_user: root
+
+# *** set the permission on the datadir
+- name: set permissions datadir
+  file: dest={{ geoserver_external_datadir }} mode=775 owner={{ tomcat_user }} group={{ tomcat_group }} recurse=yes
+  when: geoserverDataDirExternalized
+  become: yes
+  become_method: sudo
+  become_user: root
 
 # *** Setting log directories
 - name: Set GeoServer logs dir
