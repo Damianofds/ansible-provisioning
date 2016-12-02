@@ -49,8 +49,8 @@ ExecStart={{ ansible_local.java.general.java_home }}/bin/java \
   -Xms{{ min_heap_size_mb }}m \
   -XX:MetaspaceSize={{ max_permsize_mb }}m \
   -DGEOSERVER_NODE_OPTS=id:$host_ip \
-  -DGEOSERVER_AUDIT_PATH={{ geoserver_audit_dir }} \
-  -DGEOSERVER_LOG_LOCATION={{ geoserver_logs_dir }}geoserver.log \
+  -DGEOSERVER_AUDIT_PATH={{ geoserver_audit_dir }}{{ inventory_hostname }}-audit.log \
+  -DGEOSERVER_LOG_LOCATION={{ geoserver_logs_dir }}{{ inventory_hostname }}-geoserver.log \
   -classpath "{{ tomcat_env_catalina_home }}/bin/bootstrap.jar:{{ tomcat_env_catalina_home }}/bin/tomcat-juli.jar" \
   org.apache.catalina.startup.Bootstrap start
 
