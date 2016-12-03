@@ -27,6 +27,8 @@
     war1_url: http://ares.boundlessgeo.com/geoserver/2.10.x/geoserver-2.10.x-latest-war.zip
     #war1_url: "http://168.202.4.246/geoserver-2.10.x-latest-war.zip"
   roles:
-    - { role: silpion.java }
-    - { role: silpion.tomcat }
-    - { role: fds.geoserver }
+#    - { role: silpion.java }
+#    - { role: silpion.tomcat }
+#    - { role: fds.geoserver }
+    - { role: fds.apache }
+    - { role: fds.postgis }

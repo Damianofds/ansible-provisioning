@@ -1,0 +1,33 @@
+---
+# *** Install apache via apt-get
+- name: install apache2
+  yum: name=httpd state=present
+  become: yes
+  become_method: sudo
+  become_user: root
+
+# *** Enables the Apache2 modules
+- apache2_module: state=present name=proxy
+  become: yes
+  become_method: sudo
+  become_user: root
+- apache2_module: state=present name=proxy_http
+  become: yes
+  become_method: sudo
+  become_user: root
+- apache2_module: state=present name=proxy_ajp
+  become: yes
+  become_method: sudo
+  become_user: root
+
+# *** copy the ajp_proxy template
+- name: copy ajp_proxy
+  template: src=proxy_ajp.conf dest=/etc/httpd/conf.d mode=0666
+  become: yes
+  become_method: sudo
+  become_user: root
+  notify: apache_reload
+
+
+
+

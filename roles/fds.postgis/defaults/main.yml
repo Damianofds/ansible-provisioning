@@ -1,0 +1,3 @@
+---
+geoserver_db_pwd: geoserver
+pghba_directory: /var/lib/pgsql/9.3/data/

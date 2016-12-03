@@ -1,0 +1,90 @@
+---
+
+#STEP1 - add all the needed apt repos and install PostGIS
+
+- name: download postgres rpm linux packages
+  get_url: url=http://yum.postgresql.org/9.3/redhat/rhel-7-x86_64/pgdg-centos93-9.3-3.noarch.rpm dest=/tmp/pgdg-centos93-9.3-3.noarch.rpm mode=0777
+  become: yes
+  become_method: sudo
+  become_user: root
+
+- name: Install postgres rpm package
+  yum:
+     name: /tmp/pgdg-centos93-9.3-3.noarch.rpm
+     state: present
+
+
+- name: Install required PostGIS packages (and btw also vim and curl)
+  action: yum name={{ item }} state=installed update_cache=true
+  sudo: yes
+  with_items:
+    - python-psycopg2
+    - postgresql93
+    - postgis2_93
+    - postgresql93-server
+    - postgresql93-libs
+    - postgresql93-contrib
+    - postgresql93-devel
+    - vim
+    - curl
+  register: postgisinstalled
+
+- name: setting md5 ident in pga_hba.conf
+  copy: src=pg_hba.conf dest={{ pghba_directory }}
+  become: yes
+  become_method: sudo
+  become_user: root
+  when: postgisinstalled|success
+  register: postgisconfigured
+
+- systemd: state=started name=postgresql-9.3
+  when: postgisconfigured|success
+  register: postgisstarted
+
+#STEP2 - configure a spatial database for geoserver
+
+- name: create db geoserver
+  postgresql_db: name=geoserver state=present
+  become: yes
+  become_method: sudo
+  become_user: postgres
+  when: postgisstarted|success
+  register: dbcreated
+
+- name: create user geoserver
+  postgresql_user: db=geoserver name=geoserver password={{ geoserver_db_pwd }} role_attr_flags=NOSUPERUSER state=present
+  become: yes
+  become_method: sudo
+  become_user: postgres
+  when: dbcreated|success
+  register: usercreated
+
+- name: enable spatial extensions
+  postgresql_ext: name=postgis db=geoserver
+  become: yes
+  become_method: sudo
+  become_user: postgres
+  when: usercreated|success
+  register: dbconfigured
+
+- name: psql check schema geoserver
+  command: psql -t -d geoserver -c "SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = 'geoserver');"
+  register: check_schema
+  changed_when: "'f' in '{{ check_schema.stdout }}'"
+  sudo: yes
+  sudo_user: postgres
+
+- name: psql check schema geoserver
+  command: psql -t -d geoserver -c "SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = 'geoserver_test');"
+  register: check_schema_test
+  changed_when: "'f' in '{{ check_schema_test.stdout }}'"
+  sudo: yes
+  sudo_user: postgres
+
+- name: create schema geoserver
+  command: sudo -u postgres psql -d geoserver -c "CREATE SCHEMA geoserver AUTHORIZATION geoserver"
+  when: check_schema.changed
+
+- name: create schema geoserver_test
+  command: sudo -u postgres psql -d geoserver -c "CREATE SCHEMA geoserver_test AUTHORIZATION geoserver"
+  when: check_schema_test.changed
